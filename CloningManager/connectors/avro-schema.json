@@ -1,0 +1,5 @@
+﻿
+{
+  "type": "AVRO",
+  "schema": "{\"type\":\"record\",\"name\":\"product\",\"fields\":[{\"name\":\"id\",\"type\":\"int\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"description\",\"type\":\"string\"},{\"name\":\"weight\",\"type\":\"string\"}]}"
+}

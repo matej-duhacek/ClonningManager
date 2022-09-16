@@ -1,0 +1,60 @@
+docker-compose.yml
+
+navod s cistym postgres db
+https://pulsar.apache.org/docs/next/io-debezium-source/#example-of-postgresql
+
+navod s pripravenou db debezium:
+https://pulsar.apache.org/docs/io-cdc-debezium/#example-of-postgresql
+
+
+pulsar cli: .. jednorázově.. nahodit debezium
+bin/pulsar-admin sources localrun --source-config-file /pulsar/conf/debezium-postgres-source-config/debezium-postgres-source-config.yaml
+
+
+///OLDONE
+bin/pulsar-admin sources localrun --source-config-file /pulsar/conf/debezium-postgres-source-config.yaml
+
+pulsar cli:
+bin/pulsar-client consume -s "sub-products" public/default/dbserver1.inventory.products -n 0
+
+
+postgres cli:
+psql -U postgres postgres
+\c postgres;
+SET search_path TO inventory;
+select * from products;
+UPDATE products SET name='1111111111' WHERE id=107;
+
+výsledný event
+
+content: {
+  "before": {
+    "id": 108,
+    "name": "jacket",
+    "description": "water resistent black wind breaker",
+    "weight": 0.1
+  },
+  "after": {
+    "id": 108,
+    "name": "jacket",
+    "description": "byla pi??a u holi??a",
+    "weight": 0.1
+  },
+  "source": {
+    "version": "1.7.2.Final",
+    "connector": "postgresql",
+    "name": "dbserver1",
+    "ts_ms": 1657217560845,
+    "snapshot": "false",
+    "db": "postgres",
+    "sequence": "[null,\"23877256\"]",
+    "schema": "inventory",
+    "table": "products",
+    "txId": 578,
+    "lsn": 23877256,
+    "xmin": null
+  },
+  "op": "u",
+  "ts_ms": 1657217561208,
+  "transaction": null
+}

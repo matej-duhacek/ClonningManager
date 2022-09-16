@@ -1,0 +1,10 @@
+﻿tenant: "public"
+namespace: "default"
+name: "pulsar-postgres-jdbc-sink"
+topicName: "persistent://public/default/dbserver1.inventory.products"
+sinkType: "jdbc-postgres" 
+configs:
+  userName: "postgres"
+  password: "postgres"
+  jdbcUrl: "jdbc:postgresql://debezium-postgres:5432/clone"  
+  tableName: products

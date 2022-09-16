@@ -1,0 +1,72 @@
+version: "3.7"
+services:
+    postgres.debezium.pulsar:
+        container_name: postgres.debezium.pulsar
+        image: apachepulsar/pulsar:latest
+        command: ./bin/pulsar standalone && ./bin/pulsar-admin clusters update --broker-url http://postgres.debezium.pulsar:6605 --url http://postgres.debezium.pulsar:8080 standalone
+        ports:            
+            - 8080:8080 # http://localhost:8080/metrics/
+            - 6650:6650
+        environment:
+          PULSAR_MEM: " -Xms512m -Xmx512m -XX:MaxDirectMemorySize=1g"    
+        volumes:
+            - pulsardata:/pulsar/data
+            - pulsarconf:/pulsar/conf
+            - ./connectors:/pulsar/conf/connectors
+            - ./debezium-postgres-source-config:/pulsar/conf/debezium-postgres-source-config
+
+    debezium-pulsar-manager: 
+        container_name: debezium.pulsar.manager
+        image: apachepulsar/pulsar-manager:latest        
+        ports:
+          - 9527:9527 # http://localhost:9527 (login:pulsar/pulsar)
+          - 7750:7750
+        depends_on:
+          - postgres.debezium.pulsar
+        links:
+          - postgres.debezium.pulsar      
+        volumes:
+          - ./pulsar-manager-settings:/pulsar-manager/pulsar-manager-settings
+        environment:
+          SPRING_CONFIGURATION_FILE: /pulsar-manager/pulsar-manager-settings/application.properties
+        # environment:
+        #   SPRING_CONFIGURATION_FILE: /pulsar-manager/pulsar-manager/application.properties
+
+    debezium-postgres:
+        container_name: debezium.postgres
+        image: debezium/example-postgres:0.8
+        ports:
+            - "5432:5432"
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+        restart: unless-stopped
+        command: ["postgres", "-c", "log_statement=all"]
+
+volumes:
+    pulsardata:
+    pulsarconf:
+# version: "3.7"
+# services:
+#     postgres.debezium.pulsar:
+#         container_name: postgres.debezium.pulsar
+#         image: apachepulsar/pulsar:latest
+#         ports:
+#           - 8080:8080
+#           - 6650:6650
+#         environment:
+#           PULSAR_MEM: " -Xms512m -Xmx512m -XX:MaxDirectMemorySize=1g"    
+#         volumes:
+#             - pulsardata:/pulsar/data
+#             - pulsarconf:/pulsar/conf
+#             - ./connectors:/pulsar/conf/connectors
+#             - ./debezium-postgres-source-config:/pulsar/conf/debezium-postgres-source-config
+#         command: bin/pulsar standalone
+
+#     debezium-postgres:
+#         image: debezium/example-postgres:0.8
+        
+        
+# volumes:
+#     pulsardata:
+#     pulsarconf:

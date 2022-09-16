@@ -1,0 +1,24 @@
+version: "3.7"
+services:
+    postgres.debezium.pulsar:
+        container_name: postgres.debezium.pulsar
+        image: apachepulsar/pulsar:latest
+        ports:
+          - 8080:8080
+          - 6650:6650
+        environment:
+          PULSAR_MEM: " -Xms512m -Xmx512m -XX:MaxDirectMemorySize=1g"    
+        volumes:
+            - pulsardata:/pulsar/data
+            - pulsarconf:/pulsar/conf
+            - ./connectors:/pulsar/conf/connectors
+            - ./debezium-postgres-source-config.yaml:/pulsar/conf/debezium-postgres-source-config.yaml
+        command: bin/pulsar standalone
+
+    debezium-postgres:
+        image: debezium/example-postgres:0.8
+        
+        
+volumes:
+    pulsardata:
+    pulsarconf:
