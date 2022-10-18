@@ -16,6 +16,13 @@ configs:
     database.dbname: "postgres"
     database.server.name: "dbserver1"
     schema.whitelist: "inventory"
+    snapshot.mode: "always"
+    # table.include.list: inventory.customers
+    # transforms: unwrap
+    # transforms.unwrap.type: "io.debezium.transforms.ExtractNewRecordState"
+    # transforms.unwrap.drop.tombstones: "false"
+    # transforms.unwrap.delete.handling.mode: "rewrite"
+    # transforms.unwrap.add.fields: "table,lsn"
 
     ## PULSAR_SERVICE_URL_CONFIG
     pulsar.service.url: "pulsar://127.0.0.1:6650"

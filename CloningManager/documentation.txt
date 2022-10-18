@@ -3,40 +3,46 @@
 ======SOURCE CONNECTOR 
 go to the pulsar image
 docker exec -it postgres.debezium.pulsar /bin/sh
-===start Debeziun 
-bin/pulsar-admin sources localrun --source-config-file /pulsar/conf/debezium-postgres-source-config/debezium-postgres-source-config.yaml
+===start Debezium 
+bin/pulsar-admin sources localrun --archive ./conf/connectors/pulsar-io-debezium-postgres-2.10.1.nar --source-config-file ./conf/debezium-postgres-source-config/debezium-postgres-source-config.yaml
 ===start consumer from topic
-
-
-
 bin/pulsar-client consume -s "sub-products" public/default/dbserver1.inventory.products -n 0
 
-===Chcek cluster network 
+bin/pulsar-client consume -s "sub-products" public/default/dbserver1.inventory.customers -n 0
+
+
+
+======MANGER 
+
+==Chcek cluster network 
 ./bin/pulsar-admin clusters get standalone
 curl -v http://postgres.debezium.pulsar:metrics/
 ===UPDATE NETWORK URLS
-./bin/pulsar-admin clusters update --broker-url http://postgres.debezium.pulsar:6605 --url http://postgres.debezium.pulsar:8080 standalone
+./bin/pulsar-admin clusters update --broker-url http://postgres.debezium.pulsar:6605 --url http://postgres.debezium.pulsar:8080 standalone	
 
 
-
+debezium-postgres-source-config
 
 ======SINK CONNECTOR
 
 === publis avro schema to products topic
 bin/pulsar-admin schemas upload public/default/dbserver1.inventory.products -f ./conf/connectors/avro-schema.json
 
-=== get avro schema
-bin/pulsar-admin schemas get public/default/dbserver1.inventory.products
-
 === delete avro schema
 bin/pulsar-admin schemas delete public/default/dbserver1.inventory.products
-
 
 === create jdbc sink connector 
 bin/pulsar-admin sinks create --archive ./conf/connectors/pulsar-io-jdbc-postgres-2.10.1.nar --inputs public/default/dbserver1.inventory.products --name pulsar-postgres-jdbc-sink --sink-config-file ./conf/connectors/pulsar-postgres-jdbc-sink.yaml --parallelism 1
 
+=== create jdbc sink connector_1
+bin/pulsar-admin sinks create --archive ./conf/connectors/pulsar-io-jdbc-postgres-2.10.1.nar --inputs public/default/dbserver1.inventory.products_1 --name pulsar-postgres-jdbc-sink_1 --sink-config-file ./conf/connectors/pulsar-postgres-jdbc-sink.yaml --parallelism 1
+
 === Local run conncetor 
 bin/pulsar-admin sinks localrun --archive ./conf/connectors/pulsar-io-jdbc-postgres-2.10.1.nar --inputs public/default/dbserver1.inventory.products --name pulsar-postgres-jdbc-sink --sink-config-file ./conf/connectors/pulsar-postgres-jdbc-sink.yaml --parallelism 1
+
+=== Local run conncetor_2 copied config
+bin/pulsar-admin sinks localrun --archive ./conf/connectors/pulsar-io-jdbc-postgres-2.10.1.nar --inputs public/default/dbserver1.inventory.products --name pulsar-postgres-jdbc-sink2 --sink-config-file ./conf/pulsar-postgres-jdbc-sink2.yaml --parallelism 1
+
 
 ==
 https://github.com/apache/pulsar/issues/5418 
@@ -60,10 +66,19 @@ bin/pulsar-admin sink stop --namespace default --name pulsar-postgres-jdbc-sink
 ===delete connector
 bin/pulsar-admin sink delete --namespace default --name pulsar-postgres-jdbc-sink
 
+bin/pulsar-admin sink delete --namespace default --name pulsar-postgres-jdbc-sink_1
+
+
+===DB LOGS WATCH
+
 ===CORRECT SINK SUBSCRIPTION NAME
 http://localhost:9527/#/management/subscriptions/persistent/public/default/dbserver1.inventory.products/pulsar-postgres-jdbc-sink/subscription
 
 
+COPY 
+.\pulsar-postgres-jdbc-sink2.yaml postgres.debezium.pulsar:/pulsar/conf/pulsar-postgres-jdbc-sink2.yaml
 
 ===NOTES===
 https://stackoverflow.com/questions/57015003/log-all-queries-in-the-official-postgres-docker-image 
+
+bin/pulsar-admin source localrun --archive ./conf/connectors/pulsar-io-debezium-postgres-2.10.1.nar --source-config-file /pulsar/conf/debezium-postgres-source-config/debezium-postgres-source-config.yaml

@@ -8,29 +8,29 @@ services:
             - 8080:8080 # http://localhost:8080/metrics/
             - 6650:6650
         environment:
-          PULSAR_MEM: " -Xms512m -Xmx512m -XX:MaxDirectMemorySize=1g"    
+          PULSAR_MEM: " -Xms512m -Xmx512m -XX:MaxDirectMemorySize=1g"
         volumes:
             - pulsardata:/pulsar/data
             - pulsarconf:/pulsar/conf
             - ./connectors:/pulsar/conf/connectors
             - ./debezium-postgres-source-config:/pulsar/conf/debezium-postgres-source-config
 
-    debezium-pulsar-manager: 
-        container_name: debezium.pulsar.manager
-        image: apachepulsar/pulsar-manager:latest        
-        ports:
-          - 9527:9527 # http://localhost:9527 (login:pulsar/pulsar)
-          - 7750:7750
-        depends_on:
-          - postgres.debezium.pulsar
-        links:
-          - postgres.debezium.pulsar      
-        volumes:
-          - ./pulsar-manager-settings:/pulsar-manager/pulsar-manager-settings
-        environment:
-          SPRING_CONFIGURATION_FILE: /pulsar-manager/pulsar-manager-settings/application.properties
-        # environment:
-        #   SPRING_CONFIGURATION_FILE: /pulsar-manager/pulsar-manager/application.properties
+    # debezium-pulsar-manager: 
+    #     container_name: debezium.pulsar.manager
+    #     image: apachepulsar/pulsar-manager:latest
+    #     ports:
+    #       - 9527:9527 # http://localhost:9527 (login:pulsar/pulsar)
+    #       - 7750:7750
+    #     depends_on:
+    #       - postgres.debezium.pulsar
+    #     links:
+    #       - postgres.debezium.pulsar      
+    #     volumes:
+    #       - ./pulsar-manager-settings:/pulsar-manager/pulsar-manager-settings
+    #     environment:
+    #       SPRING_CONFIGURATION_FILE: /pulsar-manager/pulsar-manager-settings/application.properties
+    #     # environment:
+    #     #   SPRING_CONFIGURATION_FILE: /pulsar-manager/pulsar-manager/application.properties
 
     debezium-postgres:
         container_name: debezium.postgres

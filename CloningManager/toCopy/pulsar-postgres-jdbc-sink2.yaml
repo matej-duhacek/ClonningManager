@@ -7,4 +7,4 @@ configs:
   userName: "postgres"
   password: "postgres"
   jdbcUrl: "jdbc:postgresql://debezium-postgres:5432/clone"  
-  tableName: products
+  tableName: products_5
