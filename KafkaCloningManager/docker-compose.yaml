@@ -1,7 +1,7 @@
 ﻿version: '3.3'
 services:
   postgres:
-    image: debezium/example-postgres:latest
+    image: debezium/example-postgres:0.8
     container_name: postgres
     ports:
       - "5432:5432"
@@ -14,7 +14,7 @@ services:
   
   # Zookeeper, single node
   zookeeper:
-    image: wurstmeister/zookeeper:latest
+    image: wurstmeister/zookeeper:3.4.6
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -24,7 +24,7 @@ services:
       - "3888:3888"
      
   kafka:
-    image: debezium/kafka:latest
+    image: debezium/kafka:0.8
     restart: "no"
     links:
       - zookeeper
@@ -32,6 +32,7 @@ services:
       - "9092:9092"
     environment:
       KAFKA_BROKER_ID: 1
+      ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENERS: INTERNAL://:29092,EXTERNAL://:9092
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:29092,EXTERNAL://localhost:9092
@@ -54,7 +55,7 @@ services:
   
   # debezium connector
   kconnect:
-    image: debezium/connect:latest
+    image: debezium/connect:0.8
     ports:
       - "8083:8083"
     environment:

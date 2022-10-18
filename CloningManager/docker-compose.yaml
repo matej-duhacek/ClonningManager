@@ -37,7 +37,7 @@ services:
         image: debezium/example-postgres:0.8
         ports:
             - "5432:5432"
-        environment:
+        environment:    
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=postgres
         restart: unless-stopped
